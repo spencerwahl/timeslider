@@ -1,29 +1,56 @@
 <template>
     <div ref="el" class="time-slider absolute w-full h-full left-0 flex flex-col items-center bg-white">
-        <button class="absolute play-button" @click="intervalID >= 0 ? endLoop() : startLoop()"
+        <button
+            class="absolute play-button"
+            @click="intervalID >= 0 ? endLoop() : startLoop()"
             :content="$t(intervalID >= 0 ? 'timeslider.pause' : 'timeslider.play')"
             v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true, theme: 'ramp4' }"
-            :aria-label="$t(intervalID >= 0 ? 'timeslider.pause' : 'timeslider.play')">
-            <svg v-if="intervalID === -1" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                width="24px" fill="#595959">
+            :aria-label="$t(intervalID >= 0 ? 'timeslider.pause' : 'timeslider.play')"
+        >
+            <svg
+                v-if="intervalID === -1"
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                fill="#595959"
+            >
                 <path d="M0 0h24v24H0z" fill="none" />
                 <path d="M8 5v14l11-7z" />
             </svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                fill="#595959">
+            <svg
+                v-else
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                fill="#595959"
+            >
                 <path d="M0 0h24v24H0z" fill="none" />
                 <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
             </svg>
         </button>
-        <span class="my-2.5 text-base range-display"><span class="">{{ displayFormat ? (displayFormat as
-            any).to(parseInt(range[0]), 0) : range[0] }}</span><span class="" v-if="range[1]"> - {{ displayFormat ?
-                    (displayFormat as any).to(parseInt(range[1]), 1) : range[1] }}</span></span>
-        <button class="absolute minimize-button" @click="minimizeToggle()"
+        <span class="my-2.5 text-base range-display"
+            ><span class="">{{ displayFormat ? (displayFormat as any).to(parseInt(range[0]), 0) : range[0] }}</span
+            ><span class="" v-if="range[1]">
+                - {{ displayFormat ? (displayFormat as any).to(parseInt(range[1]), 1) : range[1] }}</span
+            ></span
+        >
+        <button
+            class="absolute minimize-button"
+            @click="minimizeToggle()"
             :content="$t(minimized ? 'timeslider.expand' : 'timeslider.minimize')"
             v-tippy="{ placement: 'top', hideOnClick: false, animateFill: true, theme: 'ramp4' }"
-            :aria-label="$t(minimized ? 'timeslider.expand' : 'timeslider.minimize')">
-            <svg v-if="!minimized" xmlns="http://www.w3.org/2000/svg" viewBox="6 6 36 36" height="24" width="24"
-                fill="#595959">
+            :aria-label="$t(minimized ? 'timeslider.expand' : 'timeslider.minimize')"
+        >
+            <svg
+                v-if="!minimized"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="6 6 36 36"
+                height="24"
+                width="24"
+                fill="#595959"
+            >
                 <path d="m24 30.75-12-12 2.15-2.15L24 26.5l9.85-9.85L36 18.8Z" />
             </svg>
             <svg v-else xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="6 6 36 36" fill="#595959">
@@ -39,8 +66,14 @@
 import { onMounted, ref } from 'vue';
 import type { PropType } from 'vue';
 import { TimeSliderPlayMode, TimeSliderFormat } from './definitions';
-import type { RangeFormatter, TimeSliderConfig, TimeSliderFormatter, ValueFormatter, DateFormatter } from './definitions';
-import noUiSlider, { PipsMode } from 'nouislider'
+import type {
+    RangeFormatter,
+    TimeSliderConfig,
+    TimeSliderFormatter,
+    ValueFormatter,
+    DateFormatter
+} from './definitions';
+import noUiSlider, { PipsMode } from 'nouislider';
 import type { API, Formatter, Options } from 'nouislider';
 import { useI18n } from 'vue-i18n';
 import { debounce } from 'throttle-debounce';
@@ -92,7 +125,7 @@ onMounted(() => {
             mode: PipsMode.Steps,
             density: 100,
             filter: (val: number) => {
-                return 1
+                return 1;
             }
         },
         ...props.config.sliderConfig
@@ -106,17 +139,16 @@ onMounted(() => {
     slider.value.on('update', sliderUpdateHandler);
 
     // run the slider update handler once all layers are loaded
-    props.rInstance.event.on(
-            'layer/layerstatechange',
-            () => {
-                if (props.rInstance.geo.layer.allLayers().every((l: any) => l.isLoaded)) {
-                    sliderUpdateHandler();
-                }
-            }
-    );
+    props.rInstance.event.on('layer/layerstatechange', () => {
+        if (props.rInstance.geo.layer.allLayers().every((l: any) => l.isLoaded)) {
+            sliderUpdateHandler();
+        }
+    });
 });
 
-const sliderUpdateHandler = debounce(250, () => {
+const sliderUpdateHandler = debounce(
+    250,
+    () => {
         const sliderValues = slider.value!.get() as string | string[];
         if (Array.isArray(sliderValues)) {
             range.value = sliderValues.map((n: string) => {
@@ -139,7 +171,7 @@ const sliderUpdateHandler = debounce(250, () => {
 
             default:
                 if (props.config.arcgisDate) {
-                    sqlString = `${props.config.attribute} >= ${makeArcGISDateQuery(range.value[0])} AND ${props.config.attribute} <= ${makeArcGISDateQuery(range.value[1])}`;    
+                    sqlString = `${props.config.attribute} >= ${makeArcGISDateQuery(range.value[0])} AND ${props.config.attribute} <= ${makeArcGISDateQuery(range.value[1])}`;
                 } else {
                     sqlString = `${props.config.attribute} >= ${range.value[0]} AND ${props.config.attribute} <= ${range.value[1]}`;
                 }
@@ -154,7 +186,7 @@ const sliderUpdateHandler = debounce(250, () => {
                     l.setSqlFilter('time_slider', sqlString);
                 });
         } else {
-            props.config.layers.forEach((layerId) => {
+            props.config.layers.forEach(layerId => {
                 const l = props.rInstance.geo.layer.getLayer(layerId);
                 l?.setSqlFilter('time_slider', sqlString);
             });
@@ -162,18 +194,19 @@ const sliderUpdateHandler = debounce(250, () => {
     },
     {
         atBegin: false
-    });
+    }
+);
 
 /**
  * Turn a timeslider value into the proper format for querying an arcgis date attribute
- * 
+ *
  * @param epochTime epoch time for a date
  */
 const makeArcGISDateQuery = (epochTime: string) => {
     const d = new Date(parseInt(epochTime));
 
-    return `timestamp '${d.getUTCFullYear()}-${d.getUTCMonth().toString().padStart(2,'0')}-${d.getUTCDay().toString().padStart(2,'0')} ${d.getUTCHours().toString().padStart(2, '0')}:${d.getUTCMinutes().toString().padStart(2, '0')}:${d.getUTCSeconds().toString().padStart(2, '0')}'` 
-}
+    return `timestamp '${d.getUTCFullYear()}-${d.getUTCMonth().toString().padStart(2, '0')}-${d.getUTCDay().toString().padStart(2, '0')} ${d.getUTCHours().toString().padStart(2, '0')}:${d.getUTCMinutes().toString().padStart(2, '0')}:${d.getUTCSeconds().toString().padStart(2, '0')}'`;
+};
 
 /**
  * Begins looping through the values on the time slider
@@ -194,14 +227,15 @@ const moveHandle = () => {
     const sliderValues = slider.value!.get(true) as number | number[];
     let newValues;
     if (Array.isArray(sliderValues)) {
-        const nextMove = slider.value!.steps()[sliderValues.length - 1][1]
+        const nextMove = slider.value!.steps()[sliderValues.length - 1][1];
         switch (props.config.animation?.playMode) {
             case TimeSliderPlayMode.Append:
                 // move only rightmost handle to the right
                 //@ts-ignore -- compiler lib value says `with` is not a function for arrays, can remove if lib target updated
                 newValues = sliderValues.with(
                     sliderValues.length - 1,
-                    nextMove ? sliderValues[sliderValues.length - 1] + nextMove : props.config.range[0]);
+                    nextMove ? sliderValues[sliderValues.length - 1] + nextMove : props.config.range[0]
+                );
                 break;
             case TimeSliderPlayMode.Distinct:
             default:
@@ -237,14 +271,18 @@ const minimizeToggle = () => {
 
 const setUpFormatters = (formatters: TimeSliderFormatter[]) => {
     // Display format
-    displayFormat.value = createFormat(formatters.find(formatter => formatter.display === true)
-        || formatters.find(formatter => formatter.display === undefined));
+    displayFormat.value = createFormat(
+        formatters.find(formatter => formatter.display === true) ||
+            formatters.find(formatter => formatter.display === undefined)
+    );
     // Internal format
     internalFormat = createFormat(formatters.find(formatter => formatter.internal === true));
     // Pip format
-    pipsFormat = createFormat(formatters.find(formatter => formatter.pips === true)
-        || formatters.find(formatter => formatter.pips === undefined));
-}
+    pipsFormat = createFormat(
+        formatters.find(formatter => formatter.pips === true) ||
+            formatters.find(formatter => formatter.pips === undefined)
+    );
+};
 
 const createFormat = (formatter: TimeSliderFormatter | undefined): Formatter | undefined => {
     if (formatter === undefined) {
@@ -256,23 +294,27 @@ const createFormat = (formatter: TimeSliderFormatter | undefined): Formatter | u
             const valueFormatter = formatter as ValueFormatter;
             return {
                 to: (val: number, index?: number) => {
-                    if (isNaN(val)) { return ''}
+                    if (isNaN(val)) {
+                        return '';
+                    }
 
                     return valueFormatter.values[val - 1];
                 },
                 from: (val: string) => {
                     return valueFormatter.values.indexOf(val);
                 }
-            }
+            };
 
         case TimeSliderFormat.Ranges:
             const rangeFormatter = formatter as RangeFormatter;
             return {
                 to: (val: number, index?: number) => {
-                    if (isNaN(val)) { return ''}
-                    
+                    if (isNaN(val)) {
+                        return '';
+                    }
+
                     if (index !== undefined) {
-                        return rangeFormatter.ranges[val - 1][index]
+                        return rangeFormatter.ranges[val - 1][index];
                     } else {
                         return rangeFormatter.ranges[val - 1].join(rangeFormatter.separator || '-');
                     }
@@ -280,40 +322,42 @@ const createFormat = (formatter: TimeSliderFormatter | undefined): Formatter | u
                 from: (val: string) => {
                     return rangeFormatter.ranges.indexOf(val.split(rangeFormatter.separator || '-'));
                 }
-            }
+            };
 
         case TimeSliderFormat.Date:
             const dateFormatter = formatter as DateFormatter;
             return {
                 to: (val: number, index?: number) => {
-                    if (isNaN(val)) { return ''}
+                    if (isNaN(val)) {
+                        return '';
+                    }
 
                     const date = new Date(val);
 
-                    const months = [
-                        'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'
-                    ]
+                    const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
                     const funcMaps = {
-                        "(Y+)": date.getFullYear(),
-                        "(D+)": date.getDate(),
-                        "(h+)": date.getHours(),
-                        "(m+)": date.getMinutes(),
-                        "(s+)": date.getSeconds()
-                    }
-
+                        '(Y+)': date.getFullYear(),
+                        '(D+)': date.getDate(),
+                        '(h+)': date.getHours(),
+                        '(m+)': date.getMinutes(),
+                        '(s+)': date.getSeconds()
+                    };
 
                     let format = dateFormatter.format;
                     Object.entries(funcMaps).forEach(([key, func]) => {
-                        format = format.replace(new RegExp(key, 'g'), (match) => {
-                            return func.toString().padStart(2, '0').slice(-1 * match.length);
+                        format = format.replace(new RegExp(key, 'g'), match => {
+                            return func
+                                .toString()
+                                .padStart(2, '0')
+                                .slice(-1 * match.length);
                         });
                     });
 
                     // checking for month separately so we can have numerical or the full name
-                    format = format.replace(new RegExp('(M+)'), (match) => {
+                    format = format.replace(new RegExp('(M+)'), match => {
                         if (match.length === 1) {
-                            return (date.getUTCMonth() + 1).toString().padStart(2,'0');
+                            return (date.getUTCMonth() + 1).toString().padStart(2, '0');
                         } else {
                             return t(`month.${months[date.getUTCMonth()]}`);
                         }
@@ -324,15 +368,14 @@ const createFormat = (formatter: TimeSliderFormatter | undefined): Formatter | u
                 from: (val: string) => {
                     return Date.parse(val);
                 }
-            }
+            };
         default:
             return undefined;
     }
-}
+};
 </script>
 
 <style lang="scss">
-
 .time-slider-container {
     bottom: 53px;
     right: 60px;
@@ -407,7 +450,6 @@ const createFormat = (formatter: TimeSliderFormatter | undefined): Formatter | u
 
     .noUi-origin {
         .noUi-handle {
-
             &::before,
             &::after {
                 content: none !important;
