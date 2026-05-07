@@ -108,6 +108,7 @@ function testBuildConfig() {
         root: 'demos',
         build: {
             outDir: `${distName}/demos`,
+            copyPublicDir: true,
             rolldownOptions: {
                 input: {
                     main: '/index.html'
