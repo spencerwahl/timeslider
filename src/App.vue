@@ -76,7 +76,7 @@ import type {
 import noUiSlider, { PipsMode } from 'nouislider';
 import type { API, Formatter, Options } from 'nouislider';
 import { useI18n } from 'vue-i18n';
-import { debounce } from 'throttle-debounce';
+import { debounce } from 'es-toolkit/function';
 
 const { t } = useI18n();
 
@@ -147,7 +147,6 @@ onMounted(() => {
 });
 
 const sliderUpdateHandler = debounce(
-    250,
     () => {
         const sliderValues = slider.value!.get() as string | string[];
         if (Array.isArray(sliderValues)) {
@@ -192,9 +191,8 @@ const sliderUpdateHandler = debounce(
             });
         }
     },
-    {
-        atBegin: false
-    }
+    250,
+    { edges: ['trailing'] }
 );
 
 /**
